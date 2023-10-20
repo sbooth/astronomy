@@ -1,5 +1,5 @@
 /*
-    moonpa.c  -  by Stephen F. Booth - 2023-10-20
+    luna.c  -  by Stephen F. Booth - 2023-10-20
 
     Example C program for Astronomy Engine:
     https://github.com/cosinekitty/astronomy
