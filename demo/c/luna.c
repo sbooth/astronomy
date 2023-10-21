@@ -112,8 +112,8 @@ int main(int argc, const char *argv[])
     puts("");
 
     /*
-       Calculate the Moon's J2000 coordinates for the right ascension and declination.
-     */
+        Calculate the Moon's J2000 coordinates for the right ascension and declination.
+    */
 	moon_equator_j2000 = Astronomy_Equator(BODY_MOON, &time, observer, EQUATOR_J2000, ABERRATION);
     if (moon_equator_j2000.status != ASTRO_SUCCESS)
     {
@@ -125,8 +125,8 @@ int main(int argc, const char *argv[])
     printf("Declination = %.2lf degrees\n", moon_equator_j2000.dec);
 
     /*
-       Calculate the Moon's horizontal coordinates for the azimuth and altitude.
-     */
+        Calculate the Moon's horizontal coordinates for the azimuth and altitude.
+    */
 	moon_equator_of_date = Astronomy_Equator(BODY_MOON, &time, observer, EQUATOR_OF_DATE, ABERRATION);
     if (moon_equator_of_date.status != ASTRO_SUCCESS)
     {
@@ -151,7 +151,7 @@ int main(int argc, const char *argv[])
     /*
         Calculate the Moon's parallactic angle (q) using
         Meeus equation 14.1 (p. 98).
-     */
+    */
     moon_hour_angle = Astronomy_HourAngle(BODY_MOON, &time, observer);
     if (moon_hour_angle.status != ASTRO_SUCCESS)
     {
@@ -171,12 +171,12 @@ int main(int argc, const char *argv[])
     moon_parallactic_angle = q * RAD2DEG;
 
     /*
-       Calculate the position angle of the Moon's bright limb (χ) using
-       Meeus equation 48.5 (p. 346).
+        Calculate the position angle of the Moon's bright limb (χ) using
+        Meeus equation 48.5 (p. 346).
 
-       The angle χ is the position angle of the midpoint of the illuminated limb
-       of the Moon reckoned eastward from the North Point of the disk (not from the axis
-       of rotation of the lunar globe). The position angles of the cusps are χ ± 90 °.
+        The angle χ is the position angle of the midpoint of the illuminated limb
+        of the Moon reckoned eastward from the North Point of the disk (not from the axis
+        of rotation of the lunar globe). The position angles of the cusps are χ ± 90 °.
     */
 //    sun_equator_of_date = Astronomy_Equator(BODY_SUN, &time, observer, EQUATOR_OF_DATE, ABERRATION);
 //    if (sun_equator_of_date.status != ASTRO_SUCCESS)
@@ -204,8 +204,8 @@ int main(int argc, const char *argv[])
         moon_position_angle += 360;
 
     /*
-       The angle χ is not measured from the direction of the observer's zenith.
-       The zenith angle of the bright limb is χ - q.
+        The angle χ is not measured from the direction of the observer's zenith.
+        The zenith angle of the bright limb is χ - q.
     */
     moon_zenith_angle = moon_position_angle - moon_parallactic_angle;
 
