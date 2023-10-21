@@ -47,6 +47,7 @@ int main(int argc, const char *argv[])
     astro_equatorial_t moon_equator_of_date;
     astro_equatorial_t moon_equator_j2000;
     astro_horizon_t moon_horizontal_coordinates;
+    astro_libration_t moon_libration;
     astro_func_result_t moon_hour_angle;
     double H, φ, δ, α;
     double q;
@@ -137,6 +138,13 @@ int main(int argc, const char *argv[])
 
     printf("Azimuth = %.2lf degrees\n", moon_horizontal_coordinates.azimuth);
     printf("Altitude = %.2lf degrees\n", moon_horizontal_coordinates.altitude);
+
+    puts("");
+
+    moon_libration = Astronomy_Libration(time);
+
+    printf("Distance = %.2lf kilometers\n", moon_libration.dist_km);
+    printf("Apparent Diameter = %.2lf degrees\n", moon_libration.diam_deg);
 
     puts("");
 
