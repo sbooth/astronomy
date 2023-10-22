@@ -22,6 +22,7 @@ static const char *PhaseAngleName(double eclipticPhaseAngle)
     switch (phase)
     {
         case 0:
+        case 8:
             return "New";
         case 1:
             return "Waxing Crescent";
