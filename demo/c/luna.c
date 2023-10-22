@@ -29,15 +29,15 @@ static const char *PhaseAngleName(double eclipticPhaseAngle)
         case 2:
             return "First Quarter";
         case 3:
-                return "Waxing Gibbous";
+            return "Waxing Gibbous";
         case 4:
-                return "Full";
+            return "Full";
         case 5:
-                return "Waning Gibbous";
+            return "Waning Gibbous";
         case 6:
-                return "Third Quarter";
+            return "Third Quarter";
         case 7:
-                return "Waning Crescent";
+            return "Waning Crescent";
         default:
             return "INVALID ECLIPTIC PHASE ANGLE";
     }
