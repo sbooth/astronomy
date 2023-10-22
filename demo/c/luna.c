@@ -181,7 +181,7 @@ int main(int argc, const char *argv[])
     δ0 = sun_equator_of_date.dec * DEG2RAD;
     α0 = sun_equator_of_date.ra * HOUR2RAD;
 
-    χ = atan2(cos(δ0) * sin(α0 - α), sin(δ0) * cos(α) - cos(δ0) * sin(α) * cos(α0 - α));
+    χ = atan2(cos(δ0) * sin(α0 - α), sin(δ0) * cos(δ) - cos(δ0) * sin(δ) * cos(α0 - α));
 
     moon_position_angle = χ * RAD2DEG;
     while (moon_position_angle < 0)
