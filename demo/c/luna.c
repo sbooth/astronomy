@@ -8,33 +8,38 @@
     or the computer's current date and time if none is given.
 */
 
-#include <stdio.h>
+#include <assert.h>
 #include <math.h>
+#include <stdio.h>
 #include "astro_demo_common.h"
 
 static const char *PhaseAngleName(double eclipticPhaseAngle)
 {
-    long int phase = lround(eclipticPhaseAngle);
-    if (phase >= 0 && phase <= 5)
-        return "New";
-    else if (phase >= 6 && phase <= 84)
-        return "Waxing Crescent";
-    else if (phase >= 85 && phase <= 95)
-        return "First Quarter";
-    else if (phase >= 96 && phase <= 174)
-        return "Waxing Gibbous";
-    else if (phase >= 175 && phase <= 185)
-        return "Full";
-    else if (phase >= 186 && phase <= 264)
-        return "Waning Gibbous";
-    else if (phase >= 265 && phase <= 275)
-        return "Third Quarter";
-    else if (phase >= 276 && phase <= 354)
-        return "Waning Crescent";
-    else if (phase >= 355 && phase <= 360)
-        return "New";
-    else
-        return "INVALID ECLIPTIC PHASE ANGLE";
+    assert(eclipticPhaseAngle >= 0);
+    assert(eclipticPhaseAngle <= 360);
+
+    int phase = (int)floor(eclipticPhaseAngle / (360 / 8));
+    switch (phase)
+    {
+        case 0:
+            return "New";
+        case 1:
+            return "Waxing Crescent";
+        case 2:
+            return "First Quarter";
+        case 3:
+                return "Waxing Gibbous";
+        case 4:
+                return "Full";
+        case 5:
+                return "Waning Gibbous";
+        case 6:
+                return "Third Quarter";
+        case 7:
+                return "Waning Crescent";
+        default:
+            return "INVALID ECLIPTIC PHASE ANGLE";
+    }
 }
 
 int main(int argc, const char *argv[])
@@ -45,15 +50,13 @@ int main(int argc, const char *argv[])
     astro_angle_result_t moon_phase;
     astro_illum_t moon_illumination;
     astro_equatorial_t moon_equator_of_date;
-    astro_equatorial_t moon_equator_j2000;
     astro_horizon_t moon_horizontal_coordinates;
     astro_libration_t moon_libration;
     astro_func_result_t moon_hour_angle;
     double H, φ, δ, α;
     double q;
     double moon_parallactic_angle;
-//    astro_equatorial_t sun_equator_of_date;
-    astro_equatorial_t sun_equator_j2000;
+    astro_equatorial_t sun_equator_of_date;
     double δ0, α0;
     double χ;
     double moon_position_angle;
@@ -108,31 +111,22 @@ int main(int argc, const char *argv[])
     }
 
     printf("Illuminated fraction = %0.2lf%%\n", 100.0 * moon_illumination.phase_fraction);
+    printf("Magnitude = %0.2lf\n", moon_illumination.mag);
 
     puts("");
 
     /*
-        Calculate the Moon's J2000 coordinates for the right ascension and declination.
-    */
-	moon_equator_j2000 = Astronomy_Equator(BODY_MOON, &time, observer, EQUATOR_J2000, ABERRATION);
-    if (moon_equator_j2000.status != ASTRO_SUCCESS)
-    {
-        fprintf(stderr, "ERROR: Astronomy_Equator returned status %d trying to get J2000 coordinates.\n", moon_equator_j2000.status);
-        return 1;
-    }
-
-    printf("Right Ascension = %.2lf hours\n", moon_equator_j2000.ra);
-    printf("Declination = %.2lf degrees\n", moon_equator_j2000.dec);
-
-    /*
         Calculate the Moon's horizontal coordinates for the azimuth and altitude.
     */
-	moon_equator_of_date = Astronomy_Equator(BODY_MOON, &time, observer, EQUATOR_OF_DATE, ABERRATION);
+    moon_equator_of_date = Astronomy_Equator(BODY_MOON, &time, observer, EQUATOR_OF_DATE, ABERRATION);
     if (moon_equator_of_date.status != ASTRO_SUCCESS)
     {
         fprintf(stderr, "ERROR: Astronomy_Equator returned status %d trying to get coordinates of date.\n", moon_equator_of_date.status);
         return 1;
     }
+
+    printf("Right Ascension = %.2lf hours\n", moon_equator_of_date.ra);
+    printf("Declination = %.2lf degrees\n", moon_equator_of_date.dec);
 
     moon_horizontal_coordinates = Astronomy_Horizon(&time, observer, moon_equator_of_date.ra, moon_equator_of_date.dec, REFRACTION_NORMAL);
 
@@ -161,10 +155,8 @@ int main(int argc, const char *argv[])
 
     H = moon_hour_angle.value * HOUR2RAD;
     φ = observer.latitude * DEG2RAD;
-//    δ = moon_equator_of_date.dec * DEG2RAD;
-//    α = moon_equator_of_date.ra * HOUR2RAD;
-    δ = moon_equator_j2000.dec * DEG2RAD;
-    α = moon_equator_j2000.ra * HOUR2RAD;
+    δ = moon_equator_of_date.dec * DEG2RAD;
+    α = moon_equator_of_date.ra * HOUR2RAD;
 
     q = atan2(sin(H), tan(φ) * cos(δ) - sin(δ) * cos(H));
 
@@ -178,24 +170,15 @@ int main(int argc, const char *argv[])
         of the Moon reckoned eastward from the North Point of the disk (not from the axis
         of rotation of the lunar globe). The position angles of the cusps are χ ± 90 °.
     */
-//    sun_equator_of_date = Astronomy_Equator(BODY_SUN, &time, observer, EQUATOR_OF_DATE, ABERRATION);
-//    if (sun_equator_of_date.status != ASTRO_SUCCESS)
-//    {
-//        printf("Astronomy_Equator error %d\n", sun_equator_of_date.status);
-//        return 1;
-//    }
-
-    sun_equator_j2000 = Astronomy_Equator(BODY_SUN, &time, observer, EQUATOR_J2000, ABERRATION);
-    if (sun_equator_j2000.status != ASTRO_SUCCESS)
+    sun_equator_of_date = Astronomy_Equator(BODY_SUN, &time, observer, EQUATOR_OF_DATE, ABERRATION);
+    if (sun_equator_of_date.status != ASTRO_SUCCESS)
     {
-        fprintf(stderr, "ERROR: Astronomy_Equator returned status %d trying to get J2000 coordinates.\n", sun_equator_j2000.status);
+        printf("Astronomy_Equator error %d\n", sun_equator_of_date.status);
         return 1;
     }
 
-//    δ0 = sun_equator_of_date.dec * DEG2RAD;
-//    α0 = sun_equator_of_date.ra * HOUR2RAD;
-    δ0 = sun_equator_j2000.dec * DEG2RAD;
-    α0 = sun_equator_j2000.ra * HOUR2RAD;
+    δ0 = sun_equator_of_date.dec * DEG2RAD;
+    α0 = sun_equator_of_date.ra * HOUR2RAD;
 
     χ = atan2(cos(δ0) * sin(α0 - α), sin(δ0) * cos(α) - cos(δ0) * sin(α) * cos(α0 - α));
 
