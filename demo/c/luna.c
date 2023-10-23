@@ -123,7 +123,7 @@ int main(int argc, const char *argv[])
         return 1;
     }
 
-    printf("%-*s ┃ %.2lf hours\n", 20, "Right Ascension", moon_equator_of_date.ra);
+    printf("%-*s ┃ %.2lf hours\n", 20, "Right ascension", moon_equator_of_date.ra);
     printf("%-*s ┃ %.2lf degrees\n", 20, "Declination", moon_equator_of_date.dec);
 
     moon_horizontal_coordinates = Astronomy_Horizon(&time, observer, moon_equator_of_date.ra, moon_equator_of_date.dec, REFRACTION_NORMAL);
@@ -136,7 +136,7 @@ int main(int argc, const char *argv[])
     moon_libration = Astronomy_Libration(time);
 
     printf("%-*s ┃ %.2lf kilometers\n", 20, "Distance", moon_libration.dist_km);
-    printf("%-*s ┃ %.2lf degrees\n", 20, "Apparent Diameter", moon_libration.diam_deg);
+    printf("%-*s ┃ %.2lf degrees\n", 20, "Apparent diameter", moon_libration.diam_deg);
 
    puts("           ━━━━━━━━━━╋━━━━━━━━━━");
 
