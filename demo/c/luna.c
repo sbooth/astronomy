@@ -23,21 +23,21 @@ static const char *PhaseAngleName(double eclipticPhaseAngle)
     {
         case 0:
         case 8:
-            return "New";
+            return "🌑 New";
         case 1:
-            return "Waxing Crescent";
+            return "🌒 Waxing Crescent";
         case 2:
-            return "First Quarter";
+            return "🌓 First Quarter";
         case 3:
-            return "Waxing Gibbous";
+            return "🌔 Waxing Gibbous";
         case 4:
-            return "Full";
+            return "🌕 Full";
         case 5:
-            return "Waning Gibbous";
+            return "🌖 Waning Gibbous";
         case 6:
-            return "Third Quarter";
+            return "🌗 Third Quarter";
         case 7:
-            return "Waning Crescent";
+            return "🌘 Waning Crescent";
         default:
             return "INVALID ECLIPTIC PHASE ANGLE";
     }
@@ -67,19 +67,16 @@ int main(int argc, const char *argv[])
     if (error)
         return error;
 
-    puts("+==============+");
-    puts("|     Luna     |");
-    puts("+==============+");
+    puts("                 The Moon");
+    puts("           ━━━━━━━━━━┳━━━━━━━━━━");
 
-    puts("");
+    printf("%-*s ┃ %s %.2lf %s %.2lf degrees\n", 20, "Observer position", observer.latitude >= 0 ? "N" : "S", fabs(observer.latitude), observer.longitude >= 0 ? "E" : "W", fabs(observer.longitude));
 
-    printf("Observer position = %s %.2lf %s %.2lf degrees\n", observer.latitude >= 0 ? "N" : "S", fabs(observer.latitude), observer.longitude >= 0 ? "E" : "W", fabs(observer.longitude));
-
-    printf("UTC date = ");
+    printf("%-*s ┃ ", 20, "UTC date");
     PrintTime(time);
     printf("\n");
 
-    puts("");
+    puts("           ━━━━━━━━━━╋━━━━━━━━━━");
 
     /*
         Calculate the Moon's ecliptic phase angle,
@@ -97,8 +94,8 @@ int main(int argc, const char *argv[])
         return 1;
     }
 
-    printf("Ecliptic phase angle = %0.3lf degrees\n", moon_phase.angle);
-    printf("Appearance = %s\n", PhaseAngleName(moon_phase.angle));
+    printf("%-*s ┃ %0.3lf degrees\n", 20, "Ecliptic phase angle", moon_phase.angle);
+    printf("%-*s ┃ %s\n", 20, "Appearance", PhaseAngleName(moon_phase.angle));
 
     /*
         Calculate the percentage of the Moon's disc that is illuminated
@@ -111,10 +108,10 @@ int main(int argc, const char *argv[])
         return 1;
     }
 
-    printf("Illuminated fraction = %0.2lf%%\n", 100.0 * moon_illumination.phase_fraction);
-    printf("Magnitude = %0.2lf\n", moon_illumination.mag);
+    printf("%-*s ┃ %0.2lf%%\n", 20, "Illuminated fraction", 100.0 * moon_illumination.phase_fraction);
+    printf("%-*s ┃ %0.2lf\n", 20, "Magnitude", moon_illumination.mag);
 
-    puts("");
+    puts("           ━━━━━━━━━━╋━━━━━━━━━━");
 
     /*
         Calculate the Moon's horizontal coordinates for the azimuth and altitude.
@@ -126,22 +123,22 @@ int main(int argc, const char *argv[])
         return 1;
     }
 
-    printf("Right Ascension = %.2lf hours\n", moon_equator_of_date.ra);
-    printf("Declination = %.2lf degrees\n", moon_equator_of_date.dec);
+    printf("%-*s ┃ %.2lf hours\n", 20, "Right Ascension", moon_equator_of_date.ra);
+    printf("%-*s ┃ %.2lf degrees\n", 20, "Declination", moon_equator_of_date.dec);
 
     moon_horizontal_coordinates = Astronomy_Horizon(&time, observer, moon_equator_of_date.ra, moon_equator_of_date.dec, REFRACTION_NORMAL);
 
-    printf("Azimuth = %.2lf degrees\n", moon_horizontal_coordinates.azimuth);
-    printf("Altitude = %.2lf degrees\n", moon_horizontal_coordinates.altitude);
+    printf("%-*s ┃ %.2lf degrees\n", 20, "Azimuth", moon_horizontal_coordinates.azimuth);
+    printf("%-*s ┃ %.2lf degrees\n", 20, "Altitude", moon_horizontal_coordinates.altitude);
 
-    puts("");
+    puts("           ━━━━━━━━━━╋━━━━━━━━━━");
 
     moon_libration = Astronomy_Libration(time);
 
-    printf("Distance = %.2lf kilometers\n", moon_libration.dist_km);
-    printf("Apparent Diameter = %.2lf degrees\n", moon_libration.diam_deg);
+    printf("%-*s ┃ %.2lf kilometers\n", 20, "Distance", moon_libration.dist_km);
+    printf("%-*s ┃ %.2lf degrees\n", 20, "Apparent Diameter", moon_libration.diam_deg);
 
-    puts("");
+   puts("           ━━━━━━━━━━╋━━━━━━━━━━");
 
     /*
         Calculate the Moon's parallactic angle (q) using
@@ -193,9 +190,11 @@ int main(int argc, const char *argv[])
     */
     moon_zenith_angle = moon_position_angle - moon_parallactic_angle;
 
-    printf("Parallactic angle = %0.3lf degrees\n", moon_parallactic_angle);
-    printf("Bright limb position angle = %0.3lf degrees\n", moon_position_angle);
-    printf("Zenith angle = %0.3lf degrees\n", moon_zenith_angle);
+    printf("%-*s ┃ %0.3lf degrees\n", 20, "Parallactic angle", moon_parallactic_angle);
+    printf("%-*s ┃ %0.3lf degrees\n", 20, "Position angle", moon_position_angle);
+    printf("%-*s ┃ %0.3lf degrees\n", 20, "Zenith angle", moon_zenith_angle);
+
+    puts("           ━━━━━━━━━━┻━━━━━━━━━━");
 
     return 0;
 }
