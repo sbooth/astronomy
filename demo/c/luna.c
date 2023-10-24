@@ -46,7 +46,7 @@ astro_angle_result_t Astronomy_ParallacticAngle(astro_body_t body, astro_time_t 
 {
     astro_equatorial_t body_equator_of_date;
     astro_func_result_t body_hour_angle;
-    double H, φ, δ;
+    double H, phi, delta;
     double q;
     astro_angle_result_t result;
 
@@ -66,10 +66,10 @@ astro_angle_result_t Astronomy_ParallacticAngle(astro_body_t body, astro_time_t 
         return AngleError(body_hour_angle.status);
 
     H = body_hour_angle.value * HOUR2RAD;
-    φ = observer.latitude * DEG2RAD;
-    δ = body_equator_of_date.dec * DEG2RAD;
+    phi = observer.latitude * DEG2RAD;
+    delta = body_equator_of_date.dec * DEG2RAD;
 
-    q = atan2(sin(H), tan(φ) * cos(δ) - sin(δ) * cos(H));
+    q = atan2(sin(H), tan(phi) * cos(delta) - sin(delta) * cos(H));
 
     result.angle = q * RAD2DEG;
     result.status = ASTRO_SUCCESS;
@@ -78,11 +78,11 @@ astro_angle_result_t Astronomy_ParallacticAngle(astro_body_t body, astro_time_t 
 }
 
 /**
- * @brief Calculates the position angle `χ` of a body's bright limb.
+ * @brief Calculates the position angle `chi` of a body's bright limb.
  *
- * The angle `χ` is the position angle of the midpoint of the illuminated limb
+ * The angle `chi` is the position angle of the midpoint of the illuminated limb
  * of the body reckoned eastward from the North point of the disk (not from the axis
- * of rotation of the globe). The position angles of the cusps are χ ± 90 °.
+ * of rotation of the globe). The position angles of the cusps are `chi` ± 90°.
  *
  * @param body
  *     The celestial body to be observed. Not allowed to be `BODY_EARTH`.
@@ -99,10 +99,10 @@ astro_angle_result_t Astronomy_ParallacticAngle(astro_body_t body, astro_time_t 
 astro_angle_result_t Astronomy_PositionAngle(astro_body_t body, astro_time_t *time, astro_observer_t observer, astro_aberration_t aberration)
 {
     astro_equatorial_t body_equator_of_date;
-    double δ, α;
+    double delta, alpha;
     astro_equatorial_t sun_equator_of_date;
-    double δ0, α0;
-    double χ;
+    double delta0, alpha0;
+    double chi;
     double body_position_angle;
     astro_angle_result_t result;
 
@@ -110,26 +110,26 @@ astro_angle_result_t Astronomy_PositionAngle(astro_body_t body, astro_time_t *ti
         return AngleError(ASTRO_INVALID_PARAMETER);
 
     /*
-     Calculate the position angle of the body's bright limb (χ) using
+     Calculate the position angle of the body's bright limb (chi) using
      Meeus equation 48.5 (p. 346).
      */
     body_equator_of_date = Astronomy_Equator(body, time, observer, EQUATOR_OF_DATE, aberration);
     if (body_equator_of_date.status != ASTRO_SUCCESS)
         return AngleError(body_equator_of_date.status);
 
-    δ = body_equator_of_date.dec * DEG2RAD;
-    α = body_equator_of_date.ra * HOUR2RAD;
+    delta = body_equator_of_date.dec * DEG2RAD;
+    alpha = body_equator_of_date.ra * HOUR2RAD;
 
     sun_equator_of_date = Astronomy_Equator(BODY_SUN, time, observer, EQUATOR_OF_DATE, aberration);
     if (sun_equator_of_date.status != ASTRO_SUCCESS)
         return AngleError(sun_equator_of_date.status);
 
-    δ0 = sun_equator_of_date.dec * DEG2RAD;
-    α0 = sun_equator_of_date.ra * HOUR2RAD;
+    delta0 = sun_equator_of_date.dec * DEG2RAD;
+    alpha0 = sun_equator_of_date.ra * HOUR2RAD;
 
-    χ = atan2(cos(δ0) * sin(α0 - α), sin(δ0) * cos(δ) - cos(δ0) * sin(δ) * cos(α0 - α));
+    chi = atan2(cos(delta0) * sin(alpha0 - alpha), sin(delta0) * cos(delta) - cos(delta0) * sin(delta) * cos(alpha0 - alpha));
 
-    body_position_angle = χ * RAD2DEG;
+    body_position_angle = chi * RAD2DEG;
     while (body_position_angle < 0)
         body_position_angle += 360;
 
