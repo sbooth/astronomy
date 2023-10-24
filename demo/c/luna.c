@@ -271,7 +271,7 @@ int main(int argc, const char *argv[])
     /*
         Calculate the position angle of the Moon's bright limb (χ)
     */
-	moon_position_angle = Astronomy_PositionAngle(BODY_MOON, &time, observer, ABERRATION);
+    moon_position_angle = Astronomy_PositionAngle(BODY_MOON, &time, observer, ABERRATION);
     if (moon_position_angle.status != ASTRO_SUCCESS)
     {
         fprintf(stderr, "ERROR: Astronomy_PositionAngle returned status %d trying to get Moon's position angle.\n", moon_position_angle.status);
