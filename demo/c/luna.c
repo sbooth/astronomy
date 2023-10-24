@@ -67,8 +67,9 @@ int main(int argc, const char *argv[])
     if (error)
         return error;
 
-    puts("                 The Moon");
-    puts("           ━━━━━━━━━━┳━━━━━━━━━━");
+    puts("           ┏━━━━━━━━━━━━━━━━━━━┓");
+    puts("           ┃     The Moon      ┃");
+    puts("           ┗━━━━━━━━━┳━━━━━━━━━┛");
 
     printf("%-*s ┃ %s %.2lf %s %.2lf degrees\n", 20, "Observer position", observer.latitude >= 0 ? "N" : "S", fabs(observer.latitude), observer.longitude >= 0 ? "E" : "W", fabs(observer.longitude));
 
@@ -76,7 +77,7 @@ int main(int argc, const char *argv[])
     PrintTime(time);
     printf("\n");
 
-    puts("           ━━━━━━━━━━╋━━━━━━━━━━");
+    puts("                ━━━━━╋━━━━━");
 
     /*
         Calculate the Moon's ecliptic phase angle,
@@ -111,7 +112,7 @@ int main(int argc, const char *argv[])
     printf("%-*s ┃ %0.2lf%%\n", 20, "Illuminated fraction", 100.0 * moon_illumination.phase_fraction);
     printf("%-*s ┃ %0.2lf\n", 20, "Magnitude", moon_illumination.mag);
 
-    puts("           ━━━━━━━━━━╋━━━━━━━━━━");
+    puts("                ━━━━━╋━━━━━");
 
     /*
         Calculate the Moon's horizontal coordinates for the azimuth and altitude.
@@ -131,14 +132,14 @@ int main(int argc, const char *argv[])
     printf("%-*s ┃ %.2lf degrees\n", 20, "Azimuth", moon_horizontal_coordinates.azimuth);
     printf("%-*s ┃ %.2lf degrees\n", 20, "Altitude", moon_horizontal_coordinates.altitude);
 
-    puts("           ━━━━━━━━━━╋━━━━━━━━━━");
+    puts("                ━━━━━╋━━━━━");
 
     moon_libration = Astronomy_Libration(time);
 
     printf("%-*s ┃ %.2lf kilometers\n", 20, "Distance", moon_libration.dist_km);
     printf("%-*s ┃ %.2lf degrees\n", 20, "Apparent diameter", moon_libration.diam_deg);
 
-   puts("           ━━━━━━━━━━╋━━━━━━━━━━");
+   puts("                ━━━━━╋━━━━━");
 
     /*
         Calculate the Moon's parallactic angle (q) using
@@ -194,7 +195,7 @@ int main(int argc, const char *argv[])
     printf("%-*s ┃ %0.3lf degrees\n", 20, "Position angle", moon_position_angle);
     printf("%-*s ┃ %0.3lf degrees\n", 20, "Zenith angle", moon_zenith_angle);
 
-    puts("           ━━━━━━━━━━┻━━━━━━━━━━");
+    puts("                ━━━━━┻━━━━━");
 
     return 0;
 }
