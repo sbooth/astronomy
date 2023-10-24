@@ -95,7 +95,7 @@ int main(int argc, const char *argv[])
         return 1;
     }
 
-    printf("%-*s ┃ %0.3lf degrees\n", 20, "Ecliptic phase angle", moon_phase.angle);
+    printf("%-*s ┃ %0.2lf degrees\n", 20, "Ecliptic phase angle", moon_phase.angle);
     printf("%-*s ┃ %s\n", 20, "Appearance", PhaseAngleName(moon_phase.angle));
 
     /*
@@ -136,7 +136,7 @@ int main(int argc, const char *argv[])
 
     moon_libration = Astronomy_Libration(time);
 
-    printf("%-*s ┃ %.2lf kilometers\n", 20, "Distance", moon_libration.dist_km);
+    printf("%-*s ┃ %ld kilometers\n", 20, "Distance", lround(moon_libration.dist_km));
     printf("%-*s ┃ %.2lf degrees\n", 20, "Apparent diameter", moon_libration.diam_deg);
 
    puts("                ━━━━━╋━━━━━");
@@ -191,9 +191,9 @@ int main(int argc, const char *argv[])
     */
     moon_zenith_angle = moon_position_angle - moon_parallactic_angle;
 
-    printf("%-*s ┃ %0.3lf degrees\n", 20, "Parallactic angle", moon_parallactic_angle);
-    printf("%-*s ┃ %0.3lf degrees\n", 20, "Position angle", moon_position_angle);
-    printf("%-*s ┃ %0.3lf degrees\n", 20, "Zenith angle", moon_zenith_angle);
+    printf("%-*s ┃ %0.2lf degrees\n", 20, "Parallactic angle", moon_parallactic_angle);
+    printf("%-*s ┃ %0.2lf degrees\n", 20, "Position angle", moon_position_angle);
+    printf("%-*s ┃ %0.2lf degrees\n", 20, "Zenith angle", moon_zenith_angle);
 
     puts("                ━━━━━┻━━━━━");
 
