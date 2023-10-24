@@ -13,6 +13,134 @@
 #include <stdio.h>
 #include "astro_demo_common.h"
 
+// MARK: -
+
+static astro_angle_result_t AngleError(astro_status_t status)
+{
+    astro_angle_result_t result;
+    result.status = status;
+    result.angle = NAN;
+    return result;
+}
+
+/**
+ * @brief Calculates the parallactic angle `q` for a body.
+ *
+ * The parallactic angle `q` is the angle between a body's zenith (the uppermost point of the
+ * body in the sky as seen by an observer) and the Northern celestial pole.
+ * `q` is the angle between a body's vertical and its hour circle.
+ *
+ * @param body
+ *     The celestial body to be observed. Not allowed to be `BODY_EARTH`.
+ * @param time
+ *     The date and time at which the observation takes place.
+ * @param observer
+ *     A location on or near the surface of the Earth.
+ * @param aberration
+ *     Selects whether or not to correct for aberration.
+ *
+ * @return
+ *     The body's parallactic angle.
+ */
+astro_angle_result_t Astronomy_ParallacticAngle(astro_body_t body, astro_time_t *time, astro_observer_t observer, astro_aberration_t aberration)
+{
+    astro_equatorial_t body_equator_of_date;
+    astro_func_result_t body_hour_angle;
+    double H, φ, δ;
+    double q;
+    astro_angle_result_t result;
+
+    if (time == NULL)
+        return AngleError(ASTRO_INVALID_PARAMETER);
+
+    body_equator_of_date = Astronomy_Equator(body, time, observer, EQUATOR_OF_DATE, aberration);
+    if (body_equator_of_date.status != ASTRO_SUCCESS)
+        return AngleError(body_equator_of_date.status);
+
+    /*
+     Calculate the parallactic angle (q) using
+     Meeus equation 14.1 (p. 98).
+     */
+    body_hour_angle = Astronomy_HourAngle(body, time, observer);
+    if (body_hour_angle.status != ASTRO_SUCCESS)
+        return AngleError(body_hour_angle.status);
+
+    H = body_hour_angle.value * HOUR2RAD;
+    φ = observer.latitude * DEG2RAD;
+    δ = body_equator_of_date.dec * DEG2RAD;
+
+    q = atan2(sin(H), tan(φ) * cos(δ) - sin(δ) * cos(H));
+
+    result.angle = q * RAD2DEG;
+    result.status = ASTRO_SUCCESS;
+
+    return result;
+}
+
+/**
+ * @brief Calculates the position angle `χ` of a body's bright limb.
+ *
+ * The angle `χ` is the position angle of the midpoint of the illuminated limb
+ * of the body reckoned eastward from the North point of the disk (not from the axis
+ * of rotation of the globe). The position angles of the cusps are χ ± 90 °.
+ *
+ * @param body
+ *     The celestial body to be observed. Not allowed to be `BODY_EARTH`.
+ * @param time
+ *     The date and time at which the observation takes place.
+ * @param observer
+ *     A location on or near the surface of the Earth.
+ * @param aberration
+ *     Selects whether or not to correct for aberration.
+ *
+ * @return
+ *     The body's bright limb position angle.
+ */
+astro_angle_result_t Astronomy_PositionAngle(astro_body_t body, astro_time_t *time, astro_observer_t observer, astro_aberration_t aberration)
+{
+    astro_equatorial_t body_equator_of_date;
+    double δ, α;
+    astro_equatorial_t sun_equator_of_date;
+    double δ0, α0;
+    double χ;
+    double body_position_angle;
+    astro_angle_result_t result;
+
+    if (time == NULL)
+        return AngleError(ASTRO_INVALID_PARAMETER);
+
+    /*
+     Calculate the position angle of the body's bright limb (χ) using
+     Meeus equation 48.5 (p. 346).
+     */
+    body_equator_of_date = Astronomy_Equator(body, time, observer, EQUATOR_OF_DATE, aberration);
+    if (body_equator_of_date.status != ASTRO_SUCCESS)
+        return AngleError(body_equator_of_date.status);
+
+    δ = body_equator_of_date.dec * DEG2RAD;
+    α = body_equator_of_date.ra * HOUR2RAD;
+
+    sun_equator_of_date = Astronomy_Equator(BODY_SUN, time, observer, EQUATOR_OF_DATE, aberration);
+    if (sun_equator_of_date.status != ASTRO_SUCCESS)
+        return AngleError(sun_equator_of_date.status);
+
+    δ0 = sun_equator_of_date.dec * DEG2RAD;
+    α0 = sun_equator_of_date.ra * HOUR2RAD;
+
+    χ = atan2(cos(δ0) * sin(α0 - α), sin(δ0) * cos(δ) - cos(δ0) * sin(δ) * cos(α0 - α));
+
+    body_position_angle = χ * RAD2DEG;
+    while (body_position_angle < 0)
+        body_position_angle += 360;
+
+    result.angle = body_position_angle;
+    result.status = ASTRO_SUCCESS;
+
+    return result;
+}
+
+// MARK: -
+
 static const char *PhaseAngleName(double eclipticPhaseAngle)
 {
     assert(eclipticPhaseAngle >= 0);
@@ -53,14 +181,8 @@ int main(int argc, const char *argv[])
     astro_equatorial_t moon_equator_of_date;
     astro_horizon_t moon_horizontal_coordinates;
     astro_libration_t moon_libration;
-    astro_func_result_t moon_hour_angle;
-    double H, φ, δ, α;
-    double q;
-    double moon_parallactic_angle;
-    astro_equatorial_t sun_equator_of_date;
-    double δ0, α0;
-    double χ;
-    double moon_position_angle;
+    astro_angle_result_t moon_parallactic_angle;
+    astro_angle_result_t moon_position_angle;
     double moon_zenith_angle;
 
     error = ParseArgs(argc, argv, &observer, &time);
@@ -82,11 +204,6 @@ int main(int argc, const char *argv[])
     /*
         Calculate the Moon's ecliptic phase angle,
         which ranges from 0 to 360 degrees.
-
-          0 = new moon,
-         90 = first quarter,
-        180 = full moon,
-        270 = third quarter.
     */
     moon_phase = Astronomy_MoonPhase(time);
     if (moon_phase.status != ASTRO_SUCCESS)
@@ -142,57 +259,33 @@ int main(int argc, const char *argv[])
    puts("                ━━━━━╋━━━━━");
 
     /*
-        Calculate the Moon's parallactic angle (q) using
-        Meeus equation 14.1 (p. 98).
+        Calculate the Moon's parallactic angle (q)
     */
-    moon_hour_angle = Astronomy_HourAngle(BODY_MOON, &time, observer);
-    if (moon_hour_angle.status != ASTRO_SUCCESS)
+    moon_parallactic_angle = Astronomy_ParallacticAngle(BODY_MOON, &time, observer, ABERRATION);
+    if (moon_parallactic_angle.status != ASTRO_SUCCESS)
     {
-        printf("Astronomy_HourAngle error %d\n", moon_hour_angle.status);
+        fprintf(stderr, "ERROR: Astronomy_ParallacticAngle returned status %d trying to get Moon's parallactic angle.\n", moon_parallactic_angle.status);
         return 1;
     }
-
-    H = moon_hour_angle.value * HOUR2RAD;
-    φ = observer.latitude * DEG2RAD;
-    δ = moon_equator_of_date.dec * DEG2RAD;
-    α = moon_equator_of_date.ra * HOUR2RAD;
-
-    q = atan2(sin(H), tan(φ) * cos(δ) - sin(δ) * cos(H));
-
-    moon_parallactic_angle = q * RAD2DEG;
 
     /*
-        Calculate the position angle of the Moon's bright limb (χ) using
-        Meeus equation 48.5 (p. 346).
-
-        The angle χ is the position angle of the midpoint of the illuminated limb
-        of the Moon reckoned eastward from the North Point of the disk (not from the axis
-        of rotation of the lunar globe). The position angles of the cusps are χ ± 90 °.
+        Calculate the position angle of the Moon's bright limb (χ)
     */
-    sun_equator_of_date = Astronomy_Equator(BODY_SUN, &time, observer, EQUATOR_OF_DATE, ABERRATION);
-    if (sun_equator_of_date.status != ASTRO_SUCCESS)
+	moon_position_angle = Astronomy_PositionAngle(BODY_MOON, &time, observer, ABERRATION);
+    if (moon_position_angle.status != ASTRO_SUCCESS)
     {
-        printf("Astronomy_Equator error %d\n", sun_equator_of_date.status);
+        fprintf(stderr, "ERROR: Astronomy_PositionAngle returned status %d trying to get Moon's position angle.\n", moon_position_angle.status);
         return 1;
     }
-
-    δ0 = sun_equator_of_date.dec * DEG2RAD;
-    α0 = sun_equator_of_date.ra * HOUR2RAD;
-
-    χ = atan2(cos(δ0) * sin(α0 - α), sin(δ0) * cos(δ) - cos(δ0) * sin(δ) * cos(α0 - α));
-
-    moon_position_angle = χ * RAD2DEG;
-    while (moon_position_angle < 0)
-        moon_position_angle += 360;
 
     /*
         The angle χ is not measured from the direction of the observer's zenith.
         The zenith angle of the bright limb is χ - q.
     */
-    moon_zenith_angle = moon_position_angle - moon_parallactic_angle;
+    moon_zenith_angle = moon_position_angle.angle - moon_parallactic_angle.angle;
 
-    printf("%-*s ┃ %0.2lf degrees\n", 20, "Parallactic angle", moon_parallactic_angle);
-    printf("%-*s ┃ %0.2lf degrees\n", 20, "Position angle", moon_position_angle);
+    printf("%-*s ┃ %0.2lf degrees\n", 20, "Parallactic angle", moon_parallactic_angle.angle);
+    printf("%-*s ┃ %0.2lf degrees\n", 20, "Position angle", moon_position_angle.angle);
     printf("%-*s ┃ %0.2lf degrees\n", 20, "Zenith angle", moon_zenith_angle);
 
     puts("                ━━━━━┻━━━━━");
