@@ -27,7 +27,7 @@ static astro_angle_result_t AngleError(astro_status_t status)
  * @brief Calculates the parallactic angle `q` for a body.
  *
  * The parallactic angle `q` is the angle between a body's zenith (the uppermost point of the
- * body in the sky as seen by an observer) and the Northern celestial pole.
+ * body in the sky as seen by an observer) and the northern celestial pole.
  * `q` is the angle between a body's vertical and its hour circle.
  *
  * @param body
@@ -81,7 +81,7 @@ astro_angle_result_t Astronomy_ParallacticAngle(astro_body_t body, astro_time_t 
  * @brief Calculates the position angle `chi` of a body's bright limb.
  *
  * The angle `chi` is the position angle of the midpoint of the illuminated limb
- * of the body reckoned eastward from the North point of the disk (not from the axis
+ * of the body reckoned eastward from the north point of the disk (not from the axis
  * of rotation of the globe). The position angles of the cusps are `chi` ± 90°.
  *
  * @param body
