@@ -96,7 +96,7 @@ astro_angle_result_t Astronomy_ParallacticAngle(astro_body_t body, astro_time_t 
  * @return
  *     The body's bright limb position angle.
  */
-astro_angle_result_t Astronomy_PositionAngle(astro_body_t body, astro_time_t *time, astro_observer_t observer, astro_aberration_t aberration)
+astro_angle_result_t Astronomy_BrightLimbAngle(astro_body_t body, astro_time_t *time, astro_observer_t observer, astro_aberration_t aberration)
 {
     astro_equatorial_t body_equator_of_date;
     double delta, alpha;
@@ -271,10 +271,10 @@ int main(int argc, const char *argv[])
     /*
         Calculate the position angle of the Moon's bright limb (χ)
     */
-    moon_position_angle = Astronomy_PositionAngle(BODY_MOON, &time, observer, ABERRATION);
+    moon_position_angle = Astronomy_BrightLimbAngle(BODY_MOON, &time, observer, ABERRATION);
     if (moon_position_angle.status != ASTRO_SUCCESS)
     {
-        fprintf(stderr, "ERROR: Astronomy_PositionAngle returned status %d trying to get Moon's position angle.\n", moon_position_angle.status);
+        fprintf(stderr, "ERROR: Astronomy_BrightLimbAngle returned status %d trying to get Moon's position angle.\n", moon_position_angle.status);
         return 1;
     }
 
