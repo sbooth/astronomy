@@ -1,13 +1,13 @@
 {
   "name": "astronomy-engine",
-  "version": "2.1.17",
+  "version": "2.1.19",
   "description": "Astronomy calculation for Sun, Moon, and planets.",
   "author": "Donald Cross",
   "license": "MIT",
   "homepage": "https://github.com/cosinekitty/astronomy#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cosinekitty/astronomy"
+    "url": "git+https://github.com/cosinekitty/astronomy.git"
   },
   "bugs": {
     "url": "https://github.com/cosinekitty/astronomy/issues"
@@ -27,6 +27,7 @@
     "constellation",
     "orbit"
   ],
+  "scripts": {},
   "files": [
     "esm/astronomy.js",
     "astronomy.d.ts",
@@ -38,7 +39,8 @@
   "exports": {
     ".": {
       "require": "./astronomy.js",
-      "import": "./esm/astronomy.js"
+      "import": "./esm/astronomy.js",
+      "types": "./astronomy.d.ts"
     }
   },
   "main": "./astronomy.js",
